@@ -1,0 +1,209 @@
+# ===== Dataset ===== #
+dataset: ImageNet
+data_url: /data/imagenet/ILSVRC/Data/CLS-LOC/
+train_dir: train
+val_dir: validation_preprocess
+train_num_samples: -1
+val_num_samples: -1
+imagenet_default_mean_and_std: False
+
+# ===== Augmentations ==== #
+auto_augment: rand-m9-mstd0.5-inc1
+aa_interpolation: bicubic
+re_mode: pixel
+re_prob: 0.25
+re_count: 1
+cutmix: 1.0
+mixup: 0.8
+mixup_prob: 1.0
+mixup_mode: batch
+mixup_off_epoch: 0.0
+switch_prob: 0.5
+label_smoothing: 0.1
+min_crop: 0.08
+crop_pct: 0.9
+
+# ===== Optimizer ======== #
+optimizer: adamw
+beta: [ 0.9, 0.999 ]
+eps: 1.0e-8
+base_lr: 2.0e-3  # 2e-3, 3e-3, 4e-3, 5e-3  # Increased if layer decay is used
+min_lr: 1.0e-6
+lr_scheduler: cosine_lr
+lr_adjust: 30
+lr_gamma: 0.97
+momentum: 0.9
+weight_decay: 0.05
+layer_decay: 0.9
+
+
+# ===== Network training config ===== #
+epochs: 100
+batch_size: 64
+is_dynamic_loss_scale: True
+loss_scale: 1024
+num_parallel_workers: 8
+start_epoch: 0
+warmup_length: 20
+warmup_lr: 0.000007
+# Gradient clipping
+use_clip_grad_norm: False
+clip_grad_norm: 1.0
+# Load pretrained setup
+exclude_epoch_state: True
+seed: 0
+# EMA
+with_ema: False
+ema_decay: 0.9999
+
+pynative_mode: False
+dataset_sink_mode: True
+disable_weight_decay_on_rel_pos_bias: False
+
+# ==== Model arguments ==== #
+arch: beit_base_patch16_224
+amp_level: O0
+file_format: ONNX
+pretrained: ''
+image_size: 224
+num_classes: 1000
+drop: 0.0
+drop_block: 0.0
+drop_path: 0.1  # Stochasitc depth
+disable_approximate_gelu: False
+layer_scale_init_value: 0.1  # 0.1 for base, 1e-5 for large. set 0 to disable layer scale
+rel_pos_bias: True
+abs_pos_emb: False
+
+
+# ===== Hardware setup ===== #
+device_id: 0
+device_num: 1
+device_target: GPU
+
+# ===== Callbacks setup ===== #
+summary_root_dir: /experiments/summary_dir/
+ckpt_root_dir: /experiments/checkpoints/
+best_ckpt_root_dir: /experiments/best_checkpoints/
+logs_root_dir: /experiments/logs/
+ckpt_keep_num: 10
+best_ckpt_num: 5
+ckpt_save_every_step: 0
+ckpt_save_every_seconds: 1800
+print_loss_every: 100
+summary_loss_collect_freq: 20
+model_postfix: 0
+collect_input_data: False
+dump_graph: False
+
+
+---
+# Config description for each option
+dataset: 'Type of dataset.'
+data_url: 'Location of the root data directory.'
+train_dir: 'Name of directory which contains training subset'
+val_dir: 'Name of directory which contains validation subset'
+train_num_samples: 'Number of samples taken from training dataset.
+  If not set, then all data is used.'
+val_num_samples: 'Number of samples taken from validation dataset. 
+  If not set, then all data is used.'
+
+auto_augment: 'AutoAugment policy.'
+aa_interpolation: 'Interpolation method for auto-augmentations.'
+re_mode: 'Random erase mode.'
+re_prob: 'Random erase prob.'
+re_count: 'Maximum number of erasing blocks per image, area per box is scaled
+  by count. per-image count is randomly chosen between 1 and this value.'
+cutmix: 'Cutmix alpha, cutmix enabled if > 0.'
+mixup: 'Mixup alpha, mixup enabled if > 0.'
+mixup_prob:
+mixup_mode: 'How to apply mixup/cutmix params: per batch, pair
+  (pair of elements) or elem (element).'
+mixup_off_epoch: 'Use mixup during training.'
+switch_prob: 'Probability of switching to cutmix instead of mixup when
+  both are active.'
+label_smoothing: 'Label smoothing to use, default 0.1'
+min_crop: 'Min random resize scale.'
+crop_pct: 'Coef to scale image before center crop in val preprocessing.'
+
+optimizer: 'Which optimizer to use.'
+beta: 'Beta for optimizer.'
+eps: 'Optimizer eps.'
+base_lr: 'Learning rate.'
+min_lr: 'Minimal learning rate.'
+lr_scheduler: 'Schedule for the learning rate.'
+lr_adjust: 'Interval to drop lr.'
+lr_gamma: 'Multistep multiplier.'
+momentum: 'Momentum.'
+weight_decay: 'Weight decay.'
+
+epochs: 'Number of total epochs to train.'
+batch_size: 'Mini-batch size, this is the total batch size of all Devices
+  on the current node when using Data Parallel or Distributed Data Parallel.'
+is_dynamic_loss_scale: 'Use Dynamic Loss scale update cell.'
+loss_scale: 'The fixed loss scale value used when updating cell with fixed
+  loss scaling value (not dynamic one).'
+num_parallel_workers: 'Number of data loading workers.'
+start_epoch: 'Manual starting epoch number (useful on restarts).'
+warmup_length: 'Number of warmup iterations.'
+warmup_lr: 'Warm up learning rate. Will be clipped to min_lr.'
+use_clip_grad_norm: 'Whether to use clip grad norm.'
+clip_grad_norm: 'Clip grad norm value.'
+exclude_epoch_state: 'Exclude epoch state and learning rate when pretrained is
+  used.'
+seed: 'Seed for initializing training.'
+with_ema: 'Training with ema.'
+ema_decay: 'Ema decay.'
+pynative_mode: 'Use PYNATIVE mode instead of GRAPH.'
+dataset_sink_mode: 'On/Off dataset sink mode for training.'
+
+arch: 'Model architecture.'
+amp_level: 'AMP Level.'
+file_format: 'File format to export model to.'
+pretrained: 'Path to checkpoint to use as a pre-trained model.'
+image_size: 'Input image size.'
+num_classes: 'Num classes in dataset.'
+drop: 'Dropout rate (default: 0.0)'
+drop_block: 'Attention drop block rate (default: 0.0)'
+drop_path: 'Drop path rate (default: 0.1)'
+disable_approximate_gelu: 'Disable Approximate GELU computing.
+  Used to correct work with weights converted from Pytorch.'
+
+device_id: 'Device id.'
+device_num: 'Devices num.'
+device_target: 'Device to run.'
+
+summary_root_dir: 'Root directory to write summary for Mindinsight.'
+ckpt_root_dir: 'Root directory to write checkpoints during training.'
+best_ckpt_root_dir: 'Root directory to write best checkpoints during training.'
+logs_root_dir: 'Root directory to write training logs.'
+ckpt_keep_num: 'Keep last N checkpoints.'
+best_ckpt_num: 'Keep last N best checkpoints.'
+ckpt_save_every_step: 'Save every N steps. To use saving by time set this
+  to 0 and use --ckpt_save_every_sec option.
+  If both are set `step` is preferred.'
+ckpt_save_every_seconds: 'Save every N seconds. To use saving by steps set
+  this to 0 and use --ckpt_save_every_step option.
+  If both are set `step` is preferred.'
+print_loss_every: 'Print loss every step.'
+summary_loss_collect_freq: 'Frequency of collecting loss while training.'
+model_postfix: 'Some additional information about the model that will be 
+  added to summary and checkpoints directories names.'
+collect_input_data: 'Flag to control collecting input data during training.
+  Important: data us collected only if dataset_sink_mode is False.'
+dump_graph: 'Do dump graph in Mindinsight logs.'
+
+---
+re_mode: [ 'const', 'rand', 'pixel' ]
+mixup_mode: [ 'batch', 'pair', 'elem' ]
+aa_interpolation: [ 'bicubic', 'lanczos', 'hamming', 'bilinear' ]
+dataset: ['ImageNet']
+optimizer: ['momentum','adamw', 'adam', 'sgd']
+lr_scheduler: [ 'multistep_lr', 'cosine_lr', 'constant_lr', 'exp_lr',
+                'onecycle' ]
+arch: [ 'beit_base_patch16_224', 'beit_base_patch16_384',
+        'beit_large_patch16_224', 'beit_large_patch16_384',
+        'beit_large_patch16_512' ]
+amp_level: ['O0', 'O1', 'O2', 'O3']
+device_target: ['Ascend', 'GPU']
+file_format: ['AIR', 'MINDIR']
